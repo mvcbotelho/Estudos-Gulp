@@ -10,7 +10,8 @@ var gulp = require('gulp'),
 	jshint = require('gulp-jshint'),
     jshintStylish = require('jshint-stylish'),
 	csslint = require('gulp-csslint'),
-    autoprefixer = require('gulp-autoprefixer');
+    autoprefixer = require('gulp-autoprefixer'),
+	less = require('gulp-less');
 
 gulp.task('default', ['copy'], function () {
 
@@ -49,15 +50,26 @@ gulp.task('server', function() {
             baseDir: 'src'
         }
     });
+
     gulp.watch('src/js/**/*.js').on('change', function (event) {
 		gulp.src(event.path)
 			.pipe(jshint())
 			.pipe(jshint.reporter(jshintStylish));
     });
+
+    gulp.watch('src/less/**/*.less').on('change', function (event) {
+        gulp.src(event.path)
+            .pipe(less().on('error', function (erro) {
+                console.log(erro.message);
+            }))
+			.pipe(gulp.dest('src/css'));
+    });
+
     gulp.watch('src/css/**/*.css').on('change', function (event) {
         gulp.src(event.path)
             .pipe(csslint())
             .pipe(csslint.reporter());
     });
+
     gulp.watch('src/**/*').on('change', browserSync.reload);
 });
